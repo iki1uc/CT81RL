@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🧿 RESPO‑SCHALTUNG · 9‑STUFIG · 3 PARAMETER</title>
-
+  <title>🧿 81‑MATRIX · RESPO · BOOT‑BLOCK · PFAD‑LOGIK</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
+    * { margin:0; padding:0; box-sizing:border-box; }
     body {
       background: radial-gradient(ellipse at 20% 30%, #0a0e1a, #000000);
       min-height: 100vh;
@@ -18,29 +16,26 @@
       padding: 16px;
       color: #c0d0d0;
     }
-
     .container {
       max-width: 1300px;
       width: 100%;
-      background: rgba(6, 8, 16, 0.6);
+      background: rgba(6,8,16,0.6);
       backdrop-filter: blur(4px);
       border-radius: 40px;
       padding: 24px 30px 30px;
-      border: 1px solid rgba(160, 200, 240, 0.05);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), inset 0 0 80px rgba(100, 180, 255, 0.02);
+      border: 1px solid rgba(160,200,240,0.05);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.9), inset 0 0 80px rgba(100,180,255,0.02);
     }
-
-    .header {
+    header {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      border-bottom: 1px solid rgba(160, 200, 240, 0.06);
+      border-bottom: 1px solid rgba(160,200,240,0.06);
       padding-bottom: 10px;
       margin-bottom: 18px;
     }
-
-    .header h1 {
+    header h1 {
       font-size: 26px;
       font-weight: 300;
       letter-spacing: 4px;
@@ -51,13 +46,12 @@
       align-items: center;
       gap: 12px;
     }
-    .header h1 small {
+    header h1 small {
       font-size: 13px;
       letter-spacing: 2px;
       -webkit-text-fill-color: #4a5a6a;
       color: #4a5a6a;
     }
-
     .status-leds {
       display: flex;
       gap: 20px;
@@ -71,8 +65,7 @@
     }
     .led {
       display: inline-block;
-      width: 10px;
-      height: 10px;
+      width: 10px; height: 10px;
       border-radius: 50%;
       background: #2a4a5a;
       transition: 0.3s;
@@ -80,657 +73,707 @@
     .led.on { background: #8cf0d0; box-shadow: 0 0 12px #8cf0d0; }
     .led.pulse { background: #f0d080; animation: pulse 1.2s infinite; }
     .led.off { background: #2a4a5a; }
-    @keyframes pulse { 0%,100%{opacity:0.4;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.2)} }
-
-    /* 3×3 Raster */
-    .grid-3x3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin: 16px 0 20px;
-    }
-    @media (max-width: 700px) {
-      .grid-3x3 { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 480px) {
-      .grid-3x3 { grid-template-columns: 1fr; }
+    @keyframes pulse {
+      0%,100%{opacity:0.4;transform:scale(0.8)}
+      50%{opacity:1;transform:scale(1.2)}
     }
 
-    .modul {
-      background: rgba(10, 14, 20, 0.5);
-      border: 1px solid rgba(100, 180, 255, 0.06);
-      border-radius: 20px;
-      padding: 16px 14px;
-      backdrop-filter: blur(2px);
-      transition: all 0.25s;
-      cursor: pointer;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
-    .modul:hover {
-      border-color: rgba(160, 200, 240, 0.15);
-      transform: translateY(-2px);
-    }
-    .modul .icon {
-      font-size: 32px;
-      line-height: 1.2;
-      margin-bottom: 4px;
-    }
-    .modul .name {
-      font-size: 14px;
-      font-weight: 500;
-      color: #d0e0e8;
-      letter-spacing: 0.5px;
-    }
-    .modul .status-tag {
-      font-size: 9px;
-      padding: 2px 12px;
-      border-radius: 20px;
-      margin: 4px 0 6px;
-      background: rgba(0,0,0,0.2);
-      border: 1px solid transparent;
-    }
-    .modul .status-tag.stabil { border-color: #8cf0d0; color: #8cf0d0; }
-    .modul .status-tag.beta { border-color: #f0d080; color: #f0d080; }
-    .modul .status-tag.alpha { border-color: #ff6b6b; color: #ff6b6b; }
-
-    .modul .toggle {
-      margin-top: 4px;
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      font-size: 10px;
-      color: #5a7a8a;
-    }
-    .modul .toggle .switch {
-      width: 36px;
-      height: 18px;
-      background: #1a2a3a;
-      border-radius: 30px;
-      position: relative;
-      cursor: pointer;
-      transition: 0.2s;
-      border: 1px solid rgba(100,180,255,0.05);
-    }
-    .modul .toggle .switch .knob {
-      width: 14px;
-      height: 14px;
-      background: #4a6a7a;
-      border-radius: 50%;
-      position: absolute;
-      top: 1px;
-      left: 2px;
-      transition: 0.25s;
-    }
-    .modul .toggle .switch.on {
-      background: #1a4a3a;
-      border-color: #8cf0d0;
-    }
-    .modul .toggle .switch.on .knob {
-      left: 18px;
-      background: #8cf0d0;
-      box-shadow: 0 0 12px #8cf0d0;
-    }
-
-    .modul .verbindungen {
-      font-size: 8px;
-      color: #445555;
-      margin-top: 3px;
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .modul .verbindungen .conn { color: #70c8ff; }
-
-    .modul.ausgewaehlt {
-      border-color: #f0d080;
-      box-shadow: 0 0 20px rgba(255,215,0,0.1);
-    }
-
-    /* Parameter */
-    .param-section {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 20px;
-      margin: 12px 0 18px;
-      background: rgba(0,0,0,0.2);
-      border-radius: 20px;
-      padding: 16px 20px;
-      border: 1px solid rgba(100,180,255,0.02);
-    }
-    @media (max-width: 700px) {
-      .param-section { grid-template-columns: 1fr; }
-    }
-    .param {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .param .label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      color: #5a7a8a;
-      letter-spacing: 0.5px;
-    }
-    .param .label .wert { color: #c0d8e8; font-weight: bold; }
-    .param input[type="range"] {
-      width: 100%;
-      height: 4px;
-      -webkit-appearance: none;
-      appearance: none;
-      background: #1a2a3a;
-      border-radius: 4px;
-      outline: none;
-    }
-    .param input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: #70c8ff;
-      cursor: pointer;
-      box-shadow: 0 0 12px rgba(100,200,255,0.2);
-    }
-
-    /* Verbindungsmatrix + Log */
-    .bottom-panel {
+    .main-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-top: 12px;
+      gap: 24px;
+      margin: 12px 0 20px;
     }
-    @media (max-width: 700px) {
-      .bottom-panel { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
 
-    .connections {
-      background: rgba(0,0,0,0.2);
-      border-radius: 16px;
-      padding: 12px 16px;
-      border: 1px solid rgba(100,180,255,0.02);
+    /* 9x9 Matrix */
+    .matrix-wrap {
+      background: rgba(0,0,0,0.25);
+      border-radius: 20px;
+      padding: 12px;
+      border: 1px solid rgba(100,180,255,0.03);
     }
-    .connections h3 {
-      font-size: 11px;
-      letter-spacing: 2px;
+    .matrix-wrap h2 {
+      font-size: 13px;
       color: #f0d080;
+      letter-spacing: 2px;
       border-bottom: 1px solid rgba(255,215,0,0.04);
       padding-bottom: 4px;
       margin-bottom: 8px;
     }
-    .conn-list {
+    .matrix {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 3px;
+      aspect-ratio: 1 / 1;
+      width: 100%;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+    .cell {
+      background: rgba(24,32,40,0.25);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: #8a9aaa;
+      transition: all 0.2s cubic-bezier(0.15,0.8,0.3,1.2);
+      cursor: pointer;
+      border: 1px solid rgba(100,140,170,0.03);
+      text-shadow: 0 0 6px rgba(160,200,240,0.1);
+      aspect-ratio: 1 / 1;
+    }
+    .cell:hover {
+      border-color: rgba(200,230,255,0.15);
+      transform: scale(1.02);
+      z-index: 2;
+    }
+    .cell.active {
+      background: radial-gradient(circle at 30% 30%, #d8e8f0, #a0b8c8);
+      color: #0a1218;
+      border-color: #b0d0e0;
+      box-shadow: 0 0 20px rgba(180,220,255,0.3), inset 0 -4px 8px rgba(0,0,0,0.2);
+      transform: scale(1.06);
+      font-weight: bold;
+    }
+    .cell.glow {
+      animation: glowPulse 0.6s ease-out;
+    }
+    @keyframes glowPulse {
+      0% { box-shadow: 0 0 0px rgba(255,215,0,0); }
+      50% { box-shadow: 0 0 30px rgba(255,215,0,0.6); transform: scale(1.15); }
+      100% { box-shadow: 0 0 10px rgba(255,215,0,0); transform: scale(1); }
+    }
+
+    /* Panel rechts */
+    .panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .card {
+      background: rgba(10,14,20,0.3);
+      border: 1px solid rgba(100,180,255,0.04);
+      border-radius: 16px;
+      padding: 14px 16px;
+    }
+    .card h3 {
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 1.5px;
+      color: #5a7a8a;
+      border-bottom: 1px solid rgba(100,180,255,0.02);
+      padding-bottom: 5px;
+      margin-bottom: 8px;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 3px 0;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(255,255,255,0.02);
+    }
+    .row .label { color: #5a6a7a; }
+    .row .value { font-weight: 500; color: #d0e0e8; }
+    .row .value.highlight { color: #f0d080; }
+
+    .btn-row {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      font-size: 10px;
-      color: #5a7a8a;
+      margin: 6px 0;
     }
-    .conn-list .pair {
-      background: rgba(0,0,0,0.2);
-      padding: 2px 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(100,200,255,0.04);
-    }
-    .conn-list .pair .mod { color: #b0d0e0; }
-
-    .log-box {
-      background: rgba(0,0,0,0.2);
-      border-radius: 16px;
-      padding: 12px 16px;
-      border: 1px solid rgba(100,180,255,0.02);
-      max-height: 150px;
-      overflow-y: auto;
-    }
-    .log-box h3 {
-      font-size: 11px;
-      letter-spacing: 2px;
-      color: #70c8ff;
-      border-bottom: 1px solid rgba(0,204,255,0.04);
-      padding-bottom: 4px;
-      margin-bottom: 6px;
-    }
-    .log-box .entry {
-      font-size: 9px;
-      color: #3a5a6a;
-      line-height: 1.5;
-      border-bottom: 1px solid rgba(100,180,255,0.01);
-      padding: 2px 0;
-    }
-    .log-box .entry .time { color: #445555; }
-    .log-box .entry .msg { color: #80d0b0; }
-    .log-box .entry .msg.conn { color: #70c8ff; }
-    .log-box .entry .msg.warn { color: #f0d080; }
-
-    .controls {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-    .controls button {
-      background: rgba(20, 28, 36, 0.5);
-      border: 1px solid rgba(120, 160, 190, 0.08);
+    button {
+      background: rgba(20,28,36,0.5);
+      border: 1px solid rgba(120,160,190,0.08);
       color: #9ab0c0;
-      padding: 6px 20px;
+      padding: 5px 14px;
       border-radius: 30px;
-      font-size: 12px;
+      font-size: 11px;
       font-family: inherit;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
       cursor: pointer;
       transition: all 0.2s;
-      backdrop-filter: blur(4px);
     }
-    .controls button:hover {
-      background: rgba(40, 70, 90, 0.25);
-      border-color: rgba(160, 200, 240, 0.15);
+    button:hover {
+      background: rgba(40,70,90,0.2);
+      border-color: rgba(160,200,240,0.15);
       color: #d0e8f8;
     }
-    .controls button.primary {
-      border-color: rgba(255,215,0,0.1);
-      color: #f0d080;
+    button.primary { border-color: rgba(255,215,0,0.15); color: #f0d080; }
+    button.primary:hover { background: rgba(255,215,0,0.05); border-color: #f0d080; }
+    button.secondary { border-color: rgba(0,204,255,0.1); color: #70c8ff; }
+    button.secondary:hover { background: rgba(0,204,255,0.04); }
+    button.danger { border-color: rgba(255,80,80,0.08); color: #d06060; }
+    button.danger:hover { background: rgba(255,80,80,0.04); }
+    button.move { border-color: rgba(255,102,255,0.1); color: #ff66ff; }
+    button.move:hover { background: rgba(255,102,255,0.04); }
+
+    .energy-bar {
+      background: #0e141c;
+      border-radius: 8px;
+      height: 6px;
+      margin: 6px 0 4px;
+      overflow: hidden;
+      border: 1px solid #16202a;
     }
-    .controls button.primary:hover {
-      background: rgba(255,215,0,0.05);
-      border-color: #f0d080;
-    }
-    .controls button.danger {
-      border-color: rgba(255,80,80,0.08);
-      color: #d06060;
-    }
-    .controls button.danger:hover {
-      background: rgba(255,80,80,0.04);
+    .energy-bar .fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff6b6b, #f0d080, #8cf0d0);
+      transition: width 0.3s;
     }
 
-    .footer {
-      text-align: center;
-      margin-top: 20px;
-      color: #1a2a30;
-      font-size: 9px;
-      letter-spacing: 3px;
+    /* Orbit Canvas */
+    .orbit-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    .footer .gold { color: #e8d080; }
-    .footer .silver { color: #b0c8d8; }
+    canvas#orbitCanvas {
+      width: 100%;
+      max-width: 280px;
+      aspect-ratio: 1 / 1;
+      background: #0a0e14;
+      border: 1px solid #16202a;
+      border-radius: 14px;
+      margin: 4px auto;
+    }
+    .pfad-visual {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 600;
+      color: #3a4a5a;
+      margin: 4px 0;
+    }
+    .pfad-visual .active { color: #f0d080; text-shadow: 0 0 16px #f0d08044; }
+    .pfad-visual .sep { color: #1a2230; }
+
+    .log-box {
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      padding: 8px 14px;
+      max-height: 100px;
+      overflow-y: auto;
+      font-size: 10px;
+      line-height: 1.6;
+      color: #5a6a7a;
+      border: 1px solid rgba(100,140,170,0.02);
+      margin-top: 4px;
+    }
+    .log-box .entry { border-bottom: 1px solid #0e141c; padding: 1px 0; }
+    .log-box .time { color: #2a3a4a; }
+    .log-box .msg { color: #b0b8c0; }
+    .log-box .msg.highlight { color: #f0d080; }
+
+    .footer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 14px;
+      padding: 8px 12px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 16px;
+      border: 1px solid rgba(100,180,255,0.02);
+      font-size: 11px;
+      color: #5a6a7a;
+    }
+    .footer .stat { display: flex; align-items: center; gap: 4px; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #080c12; }
+    ::-webkit-scrollbar-thumb { background: #16202a; border-radius: 4px; }
   </style>
 </head>
 <body>
-
 <div class="container">
 
-  <div class="header">
-    <h1>🧿 RESPO‑SCHALTUNG <small>9‑STUFIG · 3 PARAMETER</small></h1>
+  <header>
+    <h1>🧿 81‑MATRIX <small>RESPO · BOOT‑BLOCK · PFAD‑LOGIK</small></h1>
     <div class="status-leds">
       <span><span class="led on" id="ledSystem"></span> SYSTEM</span>
-      <span><span class="led pulse" id="ledIntelligenz"></span> INTELLIGENZ</span>
-      <span><span class="led" id="ledVerb"></span> VERBINDUNG</span>
+      <span><span class="led pulse" id="ledPulse"></span> LEBENDIG</span>
+      <span><span class="led" id="ledConn"></span> VERBINDUNG</span>
+    </div>
+  </header>
+
+  <div class="main-grid">
+
+    <!-- Matrix -->
+    <div class="matrix-wrap">
+      <h2>🌀 9×9 · 81 ZELLEN</h2>
+      <div class="matrix" id="matrixGrid"></div>
+      <div style="display:flex; gap:12px; margin-top:8px; font-size:11px; color:#5a7a8a; flex-wrap:wrap; justify-content:center;">
+        <span>🔹 Klick = aktivieren · <span id="activeCount">0</span>/81</span>
+        <span>⚡ Energie <span id="energyDisplay">0</span>%</span>
+        <span>🎯 Score <span id="scoreDisplay">0</span></span>
+      </div>
+    </div>
+
+    <!-- Panel -->
+    <div class="panel">
+
+      <!-- Engine -->
+      <div class="card">
+        <h3>🧠 ENGINE · KERN</h3>
+        <div class="row"><span class="label">pump</span><span class="value highlight" id="pumpDisplay">0</span></div>
+        <div class="row"><span class="label">Formel A (pump/6)</span><span class="value" id="formADisplay">0.00</span></div>
+        <div class="row"><span class="label">Formel B (pump/8)</span><span class="value" id="formBDisplay">0.00</span></div>
+        <div class="row"><span class="label">hits (A>0)</span><span class="value" id="hitsDisplay">0</span></div>
+        <div class="btn-row">
+          <button class="primary" id="btnPredictive">▶ predictiveEngine()</button>
+          <button class="danger" id="btnResetEngine">⟲ Reset</button>
+        </div>
+      </div>
+
+      <!-- Moves + Achse -->
+      <div class="card">
+        <h3>🌀 MOVES & AXIOME</h3>
+        <div class="btn-row">
+          <button class="move" data-move="OI">OI · OUT→IN</button>
+          <button class="move" data-move="IO">IO · IN→OUT</button>
+          <button class="move" data-move="XI">XI · CROSS→IN</button>
+          <button class="move" data-move="IX">IX · IN→CROSS</button>
+        </div>
+        <div class="row"><span class="label">letzter Move</span><span class="value highlight" id="lastMoveDisplay">—</span></div>
+        <div class="row"><span class="label">Achse</span><span class="value" id="axleDisplay">neutral</span></div>
+        <div class="btn-row">
+          <button class="secondary" id="btnToggleAxle">↕ toggleAxle()</button>
+          <button id="btnDoor" style="border-color:#ff6b6b;color:#ff6b6b;">🚪 DOOR</button>
+          <button id="btnDoo" style="border-color:#b388ff;color:#b388ff;">◈ DOO</button>
+        </div>
+      </div>
+
+      <!-- Orbit / PFAD -->
+      <div class="card orbit-wrap">
+        <h3>🌐 ORBIT · PFAD</h3>
+        <canvas id="orbitCanvas" width="280" height="280"></canvas>
+        <div class="pfad-visual" id="pfadVisual">
+          <span class="active" id="p0">81</span><span class="sep">→</span>
+          <span id="p1">9</span><span class="sep">→</span>
+          <span id="p2">3</span><span class="sep">→</span>
+          <span id="p3">9</span><span class="sep">→</span>
+          <span id="p4">81</span>
+        </div>
+        <div class="energy-bar"><div class="fill" id="energyFill"></div></div>
+        <div class="row"><span class="label">Aktueller Wert</span><span class="value" id="a81Display">81</span></div>
+        <div class="row"><span class="label">Zahnrad</span><span class="value" id="gearDisplay">0</span></div>
+        <div class="row"><span class="label">Modus</span><span class="value" id="modeDisplay" style="color:#6ec8ff;">STAGE</span></div>
+        <div class="btn-row">
+          <button class="primary" id="btnStep">▶ Step</button>
+          <button id="btnLoop">▶ Loop</button>
+          <button id="btnStop">⏹ Stop</button>
+          <button id="btnOmni" style="border-color:#b388ff;color:#b388ff;">🌀 OMNI</button>
+          <button class="danger" id="btnResetAll">⟲ Reset</button>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <!-- 3×3 Module -->
-  <div class="grid-3x3" id="modulGrid"></div>
-
-  <!-- 3 Parameter -->
-  <div class="param-section">
-    <div class="param">
-      <div class="label"><span>⚙️ ACHSE</span><span class="wert" id="wertAchse">50</span></div>
-      <input type="range" id="sliderAchse" min="0" max="100" value="50">
-    </div>
-    <div class="param">
-      <div class="label"><span>💧 FLUID</span><span class="wert" id="wertFluid">50</span></div>
-      <input type="range" id="sliderFluid" min="0" max="100" value="50">
-    </div>
-    <div class="param">
-      <div class="label"><span>★ DS9</span><span class="wert" id="wertDs9">50</span></div>
-      <input type="range" id="sliderDs9" min="0" max="100" value="50">
-    </div>
-  </div>
-
-  <!-- Bottom Panel -->
-  <div class="bottom-panel">
-    <div class="connections">
-      <h3>🔗 VERBINDUNGEN</h3>
-      <div class="conn-list" id="connList">Keine Verbindungen</div>
-    </div>
-    <div class="log-box" id="logBox">
-      <h3>📋 PROTOKOLL</h3>
-      <div id="logEntries"></div>
-    </div>
-  </div>
-
-  <!-- Controls -->
-  <div class="controls">
-    <button class="primary" id="btnAuto">🧠 INTELLIGENZ</button>
-    <button id="btnResetVerbindungen">⟲ VERBINDUNGEN ZURÜCK</button>
-    <button class="danger" id="btnResetAll">⟲ ALLES RESET</button>
+  <!-- Log -->
+  <div class="log-box" id="logBox">
+    <div class="entry"><span class="time">[init]</span> <span class="msg highlight">81‑MATRIX · BOOT‑BLOCK · PFAD‑LOGIK geladen</span></div>
   </div>
 
   <div class="footer">
-    <span class="gold">★</span> JEDER SCHALTER IST EIN REPO · <span class="silver">9‑STUFIGE LOGIK · 3 PARAMETER</span>
+    <div class="stat">🔹 aktiv: <span id="footerActive">0</span>/81</div>
+    <div class="stat">⚡ Energie: <span id="footerEnergy">0</span>%</div>
+    <div class="stat">🌀 Zahnrad: <span id="footerGear">0</span></div>
+    <div class="stat">⌨️  space=Step  l=Loop  o=Omni  r=Reset</div>
   </div>
+
 </div>
 
 <script>
 // ================================================================
-//  RESPO‑SCHALTUNG · 9‑STUFIG · 3 PARAMETER
-//  Module = Haupt‑Repos aus deiner Sammlung
-//  Verbindungen = logische Paare (bidirektional)
-//  Intelligenz = automatische Konfiguration basierend auf Parametern
+//  81‑MATRIX · BOOT‑BLOCK · PFAD‑LOGIK
 // ================================================================
 
-// ─── MODUL‑DEFINITIONEN ──────────────────────────────────────────
-const MODULE_DATA = [
-  { id: 'quecksilber', icon: '🧿', name: 'QUECKSILBER', status: 'stabil', prefix: 'Q' },
-  { id: 'metaball', icon: '🔮', name: 'METABALL', status: 'beta', prefix: 'M' },
-  { id: 'rawator', icon: '🧬', name: 'RAWATOR', status: 'stabil', prefix: 'R' },
-  { id: 'comic81', icon: '🎨', name: '81×81·COMIC', status: 'alpha', prefix: 'C' },
-  { id: 'repo-dash', icon: '📊', name: 'REPO‑DASHBOARD', status: 'stabil', prefix: 'R' },
-  { id: 'planet', icon: '🌌', name: 'PLANET‑ORGANISMUS', status: 'beta', prefix: 'P' },
-  { id: 'respo-schalt', icon: '⚙️', name: 'RESPO‑SCHALTUNG', status: 'stabil', prefix: 'R' },
-  { id: 'boot-block', icon: '🔗', name: 'BOOT‑BLOCK', status: 'alpha', prefix: 'B' },
-  { id: 'admin-core', icon: '🖥️', name: 'ADMIN‑CORE', status: 'stabil', prefix: 'A' }
+// ─── SYMBOLE (aus QUECKSILBER) ──────────────────────────────────
+const SYMBOLE = [
+  "▲","▼","◄","►","◆","◇","○","●","■","□","✦","✧","✪","✫","✬","✭","✮","✯",
+  "☀","☾","⊕","⚑","⚐","⚙","✹","✸","✶","✷","✳","✴","✱","✲","✢","✣","✤","✥",
+  "✦","✧","✩","✪","✫","✬","✭","✮","✯","✰","✱","✲","✳","✴","✵","✶","✷","✸",
+  "✹","✺","✻","✼","✽","✾","✿","❀","❁","❂","❃","❄","❅","❆","❇","❈","❉","❊",
+  "✦","✧","✪","✫","✬","✭","✮","✯","✰","✱","✲","✳","✴","✵","✶","✷","✸","✹"
 ];
+
+// ─── PFAD ──────────────────────────────────────────────────────
+const PFAD = [81, 9, 3, 9, 81];
+const MODE_MAP = {
+  0:'STAGE', 1:'STAGE', 2:'STAGE', 3:'STAGE',
+  4:'AIR', 5:'AIR', 6:'AIR', 7:'AIR',
+  8:'AIV', 9:'AIV', 10:'OMNI', 11:'OMNI'
+};
 
 // ─── STATE ──────────────────────────────────────────────────────
 const state = {
-  moduleStatus: {}, // id -> true/false (an/aus)
-  connections: [],  // [{a: id, b: id}]
-  selected: null,   // id für Verbindungsaufbau
-  params: { achse: 50, fluid: 50, ds9: 50 },
-  log: []
+  grid: [],
+  activeCount: 0,
+  score: 0,
+  energy: 0,
+  pump: 0,
+  hits: 0,
+  lastMove: '—',
+  axle: 'neutral',
+  door: false,
+  doo: false,
+  pfadIndex: 0,
+  a81: PFAD[0],
+  gear: 0,
+  mode: 'STAGE',
+  loopTimer: null,
+  loopActive: false,
+  stepCount: 0
 };
 
-// ─── INIT ──────────────────────────────────────────────────────
-function initState() {
-  MODULE_DATA.forEach(m => state.moduleStatus[m.id] = true);
-  state.connections = [];
-  state.selected = null;
-  // Leere Log
-  state.log = [];
-  document.getElementById('logEntries').innerHTML = '';
-  logMessage('🔌 System initialisiert · 9 Module geladen', 'ok');
+// Für externe Abfrage (z.B. via iframe)
+window.STATE = state;
+
+// ─── AUDIO ──────────────────────────────────────────────────────
+let audioCtx = null;
+function playTone(freq=440, dur=0.1) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.value = freq + (Math.random()*20-10);
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + dur);
+  } catch(_) {}
 }
 
-// ─── RENDER GRID ──────────────────────────────────────────────
-function renderGrid() {
-  const grid = document.getElementById('modulGrid');
-  grid.innerHTML = '';
-  MODULE_DATA.forEach(mod => {
-    const isOn = state.moduleStatus[mod.id];
-    const div = document.createElement('div');
-    div.className = 'modul' + (state.selected === mod.id ? ' ausgewaehlt' : '');
-    div.dataset.id = mod.id;
-
-    // Icon, Name, Status
-    div.innerHTML = `
-      <div class="icon">${mod.icon}</div>
-      <div class="name">${mod.name}</div>
-      <div class="status-tag ${mod.status}">${mod.status.toUpperCase()}</div>
-      <div class="toggle">
-        <span>${isOn ? 'AN' : 'AUS'}</span>
-        <div class="switch ${isOn ? 'on' : ''}" data-id="${mod.id}">
-          <div class="knob"></div>
-        </div>
-      </div>
-      <div class="verbindungen" id="verb-${mod.id}"></div>
-    `;
-
-    // Switch Klick
-    const sw = div.querySelector('.switch');
-    sw.addEventListener('click', (e) => {
-      e.stopPropagation();
-      toggleModule(mod.id);
-    });
-
-    // Modul Klick für Verbindungsauswahl
-    div.addEventListener('click', (e) => {
-      // Wenn auf Switch geklickt, schon behandelt
-      if (e.target.closest('.switch')) return;
-      handleModulClick(mod.id);
-    });
-
-    grid.appendChild(div);
-  });
-  updateVerbindungsAnzeige();
+// ─── GRID AUFBAUEN ─────────────────────────────────────────────
+function buildGrid() {
+  const container = document.getElementById('matrixGrid');
+  container.innerHTML = '';
+  state.grid = [];
+  for (let i=0; i<81; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.dataset.idx = i;
+    const sym = SYMBOLE[i % SYMBOLE.length];
+    cell.textContent = sym;
+    cell.addEventListener('click', () => handleCellClick(i));
+    container.appendChild(cell);
+    state.grid.push({ active: false, elem: cell, symbol: sym });
+  }
+  updateActiveCount();
 }
 
-// ─── MODUL TOGGLE ──────────────────────────────────────────────
-function toggleModule(id) {
-  state.moduleStatus[id] = !state.moduleStatus[id];
-  const isOn = state.moduleStatus[id];
-  // Verbindungen mit diesem Modul entfernen, wenn aus
-  if (!isOn) {
-    state.connections = state.connections.filter(c => c.a !== id && c.b !== id);
-    if (state.selected === id) state.selected = null;
-    logMessage(`⛔ ${getModulName(id)} ausgeschaltet · Verbindungen gelöscht`, 'warn');
-  } else {
-    logMessage(`✅ ${getModulName(id)} eingeschaltet`, 'ok');
-  }
-  renderGrid();
-  updateVerbindungsAnzeige();
-  updateLEDs();
-}
-
-// ─── MODUL KLICK (Verbindung) ─────────────────────────────────
-function handleModulClick(id) {
-  if (!state.moduleStatus[id]) {
-    logMessage(`⚠️ ${getModulName(id)} ist aus – zum Verbinden einschalten`, 'warn');
-    return;
-  }
-  if (state.selected === null) {
-    state.selected = id;
-    logMessage(`🔗 ${getModulName(id)} ausgewählt – klicke Zielmodul`, 'conn');
-    renderGrid();
-    return;
-  }
-  if (state.selected === id) {
-    state.selected = null;
-    logMessage(`↩️ Auswahl aufgehoben`, 'ok');
-    renderGrid();
-    return;
-  }
-  // Verbindung herstellen oder löschen
-  const a = state.selected;
-  const b = id;
-  const exists = state.connections.some(c => (c.a === a && c.b === b) || (c.a === b && c.b === a));
-  if (exists) {
-    state.connections = state.connections.filter(c => !((c.a === a && c.b === b) || (c.a === b && c.b === a)));
-    logMessage(`🔗 Verbindung ${getModulName(a)} ↔ ${getModulName(b)} getrennt`, 'conn');
-  } else {
-    state.connections.push({ a, b });
-    logMessage(`🔗 Verbindung ${getModulName(a)} ↔ ${getModulName(b)} hergestellt`, 'conn');
-  }
-  state.selected = null;
-  renderGrid();
-  updateVerbindungsAnzeige();
-  updateLEDs();
-}
-
-// ─── VERBINDUNGSANZEIGE ──────────────────────────────────────
-function updateVerbindungsAnzeige() {
-  // Anzeige in den Modulen
-  MODULE_DATA.forEach(mod => {
-    const el = document.getElementById(`verb-${mod.id}`);
-    if (el) {
-      const conns = state.connections
-        .filter(c => c.a === mod.id || c.b === mod.id)
-        .map(c => c.a === mod.id ? getModulName(c.b) : getModulName(c.a));
-      el.textContent = conns.length ? '🔗 ' + conns.join(' · ') : '';
+function handleCellClick(idx) {
+  const cell = state.grid[idx];
+  if (!cell) return;
+  // Toggle
+  cell.active = !cell.active;
+  const el = cell.elem;
+  if (cell.active) {
+    el.classList.add('active', 'glow');
+    setTimeout(() => el.classList.remove('glow'), 600);
+    state.activeCount++;
+    state.score += 10;
+    state.energy = Math.min(100, state.energy + 2);
+    // Engine
+    state.pump++;
+    state.hits += (state.pump > 0) ? 1 : 0;
+    playTone(600 + Math.random()*300, 0.1);
+    // DS9 Glow (zufällig)
+    if (Math.random() > 0.7) {
+      el.style.boxShadow = '0 0 40px rgba(255,215,0,0.6)';
+      setTimeout(() => el.style.boxShadow = '', 300);
     }
-  });
-
-  // Verbindungsliste
-  const list = document.getElementById('connList');
-  if (state.connections.length === 0) {
-    list.innerHTML = 'Keine Verbindungen';
   } else {
-    list.innerHTML = state.connections.map(c =>
-      `<span class="pair"><span class="mod">${getModulName(c.a)}</span> ↔ <span class="mod">${getModulName(c.b)}</span></span>`
-    ).join('');
+    el.classList.remove('active');
+    state.activeCount--;
+    state.score = Math.max(0, state.score - 2);
+    state.energy = Math.max(0, state.energy - 1);
+  }
+  updateUI();
+  updateEngineUI();
+  log(`🔹 Zelle ${idx} ${cell.active ? 'aktiviert' : 'deaktiviert'} · Score ${state.score}`, 'highlight');
+}
+
+// ─── ENGINE ─────────────────────────────────────────────────────
+function predictiveEngine() {
+  state.pump++;
+  state.hits += (state.pump > 0) ? 1 : 0;
+  state.energy = Math.min(100, state.energy + 3);
+  updateEngineUI();
+  updateUI();
+  log(`🧠 predictiveEngine() · pump=${state.pump} · hits=${state.hits}`, 'highlight');
+}
+
+function resetEngine() {
+  state.pump = 0;
+  state.hits = 0;
+  updateEngineUI();
+  log('⟲ Engine zurückgesetzt', 'highlight');
+}
+
+function updateEngineUI() {
+  document.getElementById('pumpDisplay').textContent = state.pump;
+  document.getElementById('formADisplay').textContent = (state.pump / 6).toFixed(2);
+  document.getElementById('formBDisplay').textContent = (state.pump / 8).toFixed(2);
+  document.getElementById('hitsDisplay').textContent = state.hits;
+}
+
+// ─── MOVES ──────────────────────────────────────────────────────
+function doMove(type) {
+  state.lastMove = type;
+  state.energy = Math.min(100, state.energy + 5);
+  document.getElementById('lastMoveDisplay').textContent = type;
+  log(`🌀 Move: ${type}`, 'highlight');
+  updateUI();
+}
+
+function toggleAxle() {
+  state.axle = (state.axle === 'neutral') ? 'active' : 'neutral';
+  document.getElementById('axleDisplay').textContent = state.axle;
+  log(`↕ Achse → ${state.axle}`, 'highlight');
+}
+
+function doorAction() {
+  state.door = !state.door;
+  log(`🚪 DOOR ${state.door ? 'geöffnet' : 'geschlossen'}`, 'highlight');
+}
+
+function dooAction() {
+  state.doo = !state.doo;
+  log(`◈ DOO ${state.doo ? 'aktiviert' : 'deaktiviert'}`, 'highlight');
+}
+
+// ─── PFAD‑STEP ─────────────────────────────────────────────────
+function stepPFAD() {
+  state.energy = Math.min(100, state.energy + 3);
+  state.gear = (state.gear + 1) % 12;
+  state.mode = MODE_MAP[state.gear] || 'STAGE';
+  state.pfadIndex = (state.pfadIndex + 1) % PFAD.length;
+  state.a81 = PFAD[state.pfadIndex];
+  state.stepCount++;
+  updateUI();
+  drawOrbit();
+  log(`⏭ Step ${state.stepCount} · ${state.mode} · A81=${state.a81} · Zahnrad=${state.gear}`, 'highlight');
+}
+
+function toggleLoop() {
+  if (state.loopTimer) {
+    clearInterval(state.loopTimer); state.loopTimer = null;
+    state.loopActive = false;
+    document.getElementById('btnLoop').textContent = '▶ Loop';
+    log('⏸ Loop gestoppt');
+  } else {
+    state.loopTimer = setInterval(stepPFAD, 500);
+    state.loopActive = true;
+    document.getElementById('btnLoop').textContent = '⏹ Loop';
+    log('▶ Loop gestartet');
   }
 }
 
-// ─── HILFSFUNKTIONEN ──────────────────────────────────────────
-function getModulName(id) {
-  const m = MODULE_DATA.find(x => x.id === id);
-  return m ? m.name : id;
-}
-
-function updateLEDs() {
-  const anyConn = state.connections.length > 0;
-  document.getElementById('ledVerb').className = 'led ' + (anyConn ? 'on' : '');
-  const anyOn = Object.values(state.moduleStatus).some(v => v === true);
-  document.getElementById('ledSystem').className = 'led ' + (anyOn ? 'on' : 'off');
-}
-
-// ─── LOG ──────────────────────────────────────────────────────
-function logMessage(msg, type = 'ok') {
-  const container = document.getElementById('logEntries');
-  const entry = document.createElement('div');
-  entry.className = 'entry';
-  const time = new Date().toLocaleTimeString();
-  const cls = type === 'conn' ? 'conn' : type === 'warn' ? 'warn' : 'msg';
-  entry.innerHTML = `<span class="time">[${time}]</span> <span class="msg ${cls}">${msg}</span>`;
-  container.appendChild(entry);
-  container.scrollTop = container.scrollHeight;
-  // Begrenzen
-  while (container.children.length > 40) container.removeChild(container.firstChild);
-}
-
-// ─── PARAMETER ──────────────────────────────────────────────────
-function setupSliders() {
-  const sliders = [
-    { id: 'sliderAchse', key: 'achse', display: 'wertAchse' },
-    { id: 'sliderFluid', key: 'fluid', display: 'wertFluid' },
-    { id: 'sliderDs9', key: 'ds9', display: 'wertDs9' }
-  ];
-  sliders.forEach(s => {
-    const el = document.getElementById(s.id);
-    const display = document.getElementById(s.display);
-    el.addEventListener('input', () => {
-      const val = parseInt(el.value);
-      state.params[s.key] = val;
-      display.textContent = val;
-      // Parameter beeinflussen automatisch Module (Intelligenz)
-      autoSchaltung();
-    });
-  });
-}
-
-// ─── INTELLIGENZ (AUTO-SCHALTUNG) ──────────────────────────────
-function autoSchaltung() {
-  const p = state.params;
-  // Modul-Bedingungen basierend auf Parametern
-  // Achse > 50 → QUECKSILBER, RESPO-SCHALTUNG, ADMIN-CORE
-  // Fluid > 50 → METABALL, RAWATOR, PLANET
-  // DS9 > 50 → COMIC81, BOOT-BLOCK, REPO-DASH
-  const regeln = [
-    { id: 'quecksilber', bedingung: p.achse > 50 },
-    { id: 'metaball', bedingung: p.fluid > 50 },
-    { id: 'rawator', bedingung: p.fluid > 40 },
-    { id: 'comic81', bedingung: p.ds9 > 50 },
-    { id: 'repo-dash', bedingung: p.ds9 > 30 },
-    { id: 'planet', bedingung: p.fluid > 30 },
-    { id: 'respo-schalt', bedingung: p.achse > 40 },
-    { id: 'boot-block', bedingung: p.ds9 > 40 },
-    { id: 'admin-core', bedingung: p.achse > 30 }
-  ];
-
-  let changes = 0;
-  regeln.forEach(r => {
-    const soll = r.bedingung;
-    const ist = state.moduleStatus[r.id];
-    if (soll !== ist) {
-      state.moduleStatus[r.id] = soll;
-      changes++;
-    }
-  });
-
-  if (changes > 0) {
-    logMessage(`🧠 Intelligenz aktiv · ${changes} Module neu konfiguriert`, 'conn');
-    // Verbindungen automatisch anpassen (paarweise)
-    const aktive = MODULE_DATA.filter(m => state.moduleStatus[m.id]).map(m => m.id);
-    // Verbinde alle aktiven mit ähnlichem Präfix (R->R, etc.)
-    const neueConn = [];
-    for (let i = 0; i < aktive.length; i++) {
-      for (let j = i+1; j < aktive.length; j++) {
-        const a = MODULE_DATA.find(m => m.id === aktive[i]);
-        const b = MODULE_DATA.find(m => m.id === aktive[j]);
-        if (a && b && a.prefix === b.prefix) {
-          neueConn.push({ a: a.id, b: b.id });
-        }
-      }
-    }
-    state.connections = neueConn;
-    renderGrid();
-    updateVerbindungsAnzeige();
-    updateLEDs();
+function toggleOmni() {
+  if (state.gear < 10) {
+    state.gear = 10; state.mode = 'OMNI';
+    log('🌀 OMNI aktiviert!', 'highlight');
+  } else {
+    state.gear = 8; state.mode = 'AIV';
+    log('🌀 OMNI deaktiviert → AIV', 'highlight');
   }
-}
-
-// ─── RESETS ─────────────────────────────────────────────────────
-function resetVerbindungen() {
-  state.connections = [];
-  state.selected = null;
-  renderGrid();
-  updateVerbindungsAnzeige();
-  updateLEDs();
-  logMessage('⟲ Alle Verbindungen zurückgesetzt', 'ok');
+  updateUI(); drawOrbit();
 }
 
 function resetAll() {
-  MODULE_DATA.forEach(m => state.moduleStatus[m.id] = true);
-  state.connections = [];
-  state.selected = null;
-  state.params = { achse: 50, fluid: 50, ds9: 50 };
-  document.getElementById('sliderAchse').value = 50;
-  document.getElementById('sliderFluid').value = 50;
-  document.getElementById('sliderDs9').value = 50;
-  document.getElementById('wertAchse').textContent = '50';
-  document.getElementById('wertFluid').textContent = '50';
-  document.getElementById('wertDs9').textContent = '50';
-  document.getElementById('logEntries').innerHTML = '';
-  logMessage('⟲ ALLES RESET · System neu gestartet', 'ok');
-  renderGrid();
-  updateVerbindungsAnzeige();
-  updateLEDs();
+  if (state.loopTimer) {
+    clearInterval(state.loopTimer); state.loopTimer = null;
+    state.loopActive = false;
+    document.getElementById('btnLoop').textContent = '▶ Loop';
+  }
+  // Grid zurücksetzen
+  state.grid.forEach(c => { c.active = false; c.elem.classList.remove('active', 'glow'); });
+  state.activeCount = 0;
+  state.score = 0;
+  state.energy = 0;
+  state.pump = 0;
+  state.hits = 0;
+  state.lastMove = '—';
+  state.axle = 'neutral';
+  state.door = false;
+  state.doo = false;
+  state.pfadIndex = 0;
+  state.a81 = PFAD[0];
+  state.gear = 0;
+  state.mode = 'STAGE';
+  state.stepCount = 0;
+  document.getElementById('lastMoveDisplay').textContent = '—';
+  document.getElementById('axleDisplay').textContent = 'neutral';
+  updateUI(); updateEngineUI(); drawOrbit();
+  log('⟲ RESET – Alles zurückgesetzt', 'highlight');
 }
 
-// ─── BUTTONS ────────────────────────────────────────────────────
-document.getElementById('btnAuto').addEventListener('click', () => {
-  // Setze Parameter auf zufällige Werte und führe Auto aus
-  const zufall = () => Math.floor(Math.random() * 100);
-  ['achse', 'fluid', 'ds9'].forEach(key => {
-    const val = zufall();
-    state.params[key] = val;
-    const slider = document.getElementById(key === 'achse' ? 'sliderAchse' : key === 'fluid' ? 'sliderFluid' : 'sliderDs9');
-    slider.value = val;
-    const display = document.getElementById(key === 'achse' ? 'wertAchse' : key === 'fluid' ? 'wertFluid' : 'wertDs9');
-    display.textContent = val;
+// ─── ORBIT CANVAS ──────────────────────────────────────────────
+function drawOrbit() {
+  const canvas = document.getElementById('orbitCanvas');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  const cx = w/2, cy = h/2, r = Math.min(w,h)*0.4;
+  const t = Date.now()/1000;
+
+  ctx.clearRect(0,0,w,h);
+  // 9 Achsen (d,e,i,n,o,r,s,u,w)
+  const achsen = ['d','e','i','n','o','r','s','u','w'];
+  const points = achsen.map((_,i) => {
+    const angle = (i/achsen.length)*2*Math.PI - Math.PI/2 + Math.sin(t*0.08)*0.02;
+    return { x: cx + r*Math.cos(angle), y: cy + r*Math.sin(angle) };
   });
-  autoSchaltung();
-  logMessage('🧠 INTELLIGENZ manuell ausgelöst · Parameter zufällig', 'conn');
+  ctx.strokeStyle = '#1a2230'; ctx.lineWidth=1.5;
+  ctx.beginPath();
+  points.forEach((p,i) => {
+    const next = points[(i+1)%points.length];
+    ctx.moveTo(p.x,p.y); ctx.lineTo(next.x,next.y);
+  });
+  ctx.stroke();
+  points.forEach((p,i) => {
+    const active = (achsen[i] === 'd');
+    ctx.beginPath();
+    ctx.arc(p.x,p.y, active?24:14, 0, 2*Math.PI);
+    ctx.fillStyle = active ? '#ffd866' : '#0e141c';
+    ctx.fill();
+    ctx.strokeStyle = active ? '#ffd866' : '#2a3a4a';
+    ctx.lineWidth = active ? 2 : 1;
+    ctx.stroke();
+    ctx.fillStyle = active ? '#06080c' : '#5a6a7a';
+    ctx.font = '600 14px monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(achsen[i], p.x, p.y);
+  });
+  // PFAD-Marker
+  const val = state.a81;
+  const px = cx + Math.sin(t*2 + state.pfadIndex)*Math.min(50, val*0.5);
+  const py = cy + Math.cos(t*2 + state.pfadIndex)*Math.min(50, val*0.5);
+  ctx.fillStyle = val===81 ? '#ff0' : (val===3 ? '#0ff' : '#0f0');
+  ctx.beginPath();
+  ctx.arc(px,py, val===81?10:6, 0, 2*Math.PI);
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = '10px monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+  ctx.fillText(val, px, py-12);
+  // Legende
+  const modeColors = { STAGE:'#6ec8ff', AIR:'#ffd866', AIV:'#ff7b7b', OMNI:'#b388ff' };
+  const color = modeColors[state.mode] || '#6ec8ff';
+  document.getElementById('orbitLegend')?.remove();
+}
+
+// ─── UI UPDATE ──────────────────────────────────────────────────
+function updateUI() {
+  document.getElementById('activeCount').textContent = state.activeCount;
+  document.getElementById('scoreDisplay').textContent = state.score;
+  document.getElementById('energyDisplay').textContent = Math.round(state.energy);
+  document.getElementById('energyFill').style.width = state.energy + '%';
+  document.getElementById('footerActive').textContent = state.activeCount;
+  document.getElementById('footerEnergy').textContent = Math.round(state.energy);
+  document.getElementById('footerGear').textContent = state.gear;
+
+  document.getElementById('a81Display').textContent = state.a81;
+  document.getElementById('gearDisplay').textContent = state.gear;
+  const modeColors = { STAGE:'#6ec8ff', AIR:'#ffd866', AIV:'#ff7b7b', OMNI:'#b388ff' };
+  document.getElementById('modeDisplay').textContent = state.mode;
+  document.getElementById('modeDisplay').style.color = modeColors[state.mode] || '#6ec8ff';
+
+  // PFAD-Visual
+  for (let i=0; i<PFAD.length; i++) {
+    const el = document.getElementById('p'+i);
+    if (el) {
+      el.className = (i===state.pfadIndex) ? 'active' : '';
+      el.textContent = PFAD[i];
+    }
+  }
+  document.getElementById('ledSystem').className = 'led ' + (state.activeCount>0 ? 'on' : 'off');
+  document.getElementById('ledPulse').className = 'led ' + (state.loopActive ? 'pulse' : 'on');
+  document.getElementById('ledConn').className = 'led ' + (state.door || state.doo ? 'on' : 'off');
+}
+
+function updateActiveCount() {
+  const count = state.grid.filter(c => c.active).length;
+  state.activeCount = count;
+  document.getElementById('activeCount').textContent = count;
+}
+
+// ─── LOG ────────────────────────────────────────────────────────
+function log(msg, type='') {
+  const box = document.getElementById('logBox');
+  const time = new Date().toLocaleTimeString('de-DE');
+  const entry = document.createElement('div');
+  entry.className = 'entry';
+  const cls = type==='highlight' ? 'msg highlight' : 'msg';
+  entry.innerHTML = `<span class="time">[${time}]</span> <span class="${cls}">${msg}</span>`;
+  box.prepend(entry);
+  while (box.children.length > 60) box.lastChild?.remove();
+}
+
+// ─── EVENTS ────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  buildGrid();
+  updateUI();
+  updateEngineUI();
+  drawOrbit();
+  log('🌀 81‑MATRIX · BOOT‑BLOCK · PFAD‑LOGIK bereit', 'highlight');
 });
 
-document.getElementById('btnResetVerbindungen').addEventListener('click', resetVerbindungen);
+document.getElementById('btnPredictive').addEventListener('click', predictiveEngine);
+document.getElementById('btnResetEngine').addEventListener('click', resetEngine);
+
+document.querySelectorAll('[data-move]').forEach(btn => {
+  btn.addEventListener('click', () => doMove(btn.dataset.move));
+});
+document.getElementById('btnToggleAxle').addEventListener('click', toggleAxle);
+document.getElementById('btnDoor').addEventListener('click', doorAction);
+document.getElementById('btnDoo').addEventListener('click', dooAction);
+
+document.getElementById('btnStep').addEventListener('click', stepPFAD);
+document.getElementById('btnLoop').addEventListener('click', toggleLoop);
+document.getElementById('btnStop').addEventListener('click', () => {
+  if (state.loopTimer) {
+    clearInterval(state.loopTimer); state.loopTimer = null;
+    state.loopActive = false;
+    document.getElementById('btnLoop').textContent = '▶ Loop';
+    log('⏹ Loop manuell gestoppt');
+  }
+});
+document.getElementById('btnOmni').addEventListener('click', toggleOmni);
 document.getElementById('btnResetAll').addEventListener('click', resetAll);
 
 // ─── TASTATUR ──────────────────────────────────────────────────
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'i' || e.key === 'I') document.getElementById('btnAuto').click();
-  if (e.key === 'r' || e.key === 'R') document.getElementById('btnResetVerbindungen').click();
-  if (e.key === 'x' || e.key === 'X') document.getElementById('btnResetAll').click();
+  if (e.key === ' ') { e.preventDefault(); stepPFAD(); }
+  if (e.key === 'l' || e.key === 'L') toggleLoop();
+  if (e.key === 'o' || e.key === 'O') toggleOmni();
+  if (e.key === 'r' || e.key === 'R') resetAll();
 });
 
-// ─── INIT ──────────────────────────────────────────────────────
-initState();
-renderGrid();
-setupSliders();
-updateLEDs();
-logMessage('⌨️  i=Intelligenz  r=Reset Verbindungen  x=Alles Reset', 'ok');
+// ─── INITIALER GLANZ ──────────────────────────────────────────
+setTimeout(() => {
+  for (let i=0; i<10; i++) {
+    const idx = Math.floor(Math.random()*81);
+    const cell = state.grid[idx];
+    if (cell) {
+      cell.elem.classList.add('active');
+      cell.active = true;
+      state.activeCount++;
+      state.score += 10;
+      state.energy = Math.min(100, state.energy + 2);
+      state.pump++;
+      state.hits++;
+    }
+  }
+  updateUI(); updateEngineUI();
+  log('✨ 10 Zellen initial aktiviert', 'highlight');
+}, 300);
 </script>
-
 </body>
 </html>
